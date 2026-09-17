@@ -3,6 +3,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 
 from database import Base, engine, get_db
 import models, schemas, nlu, security
@@ -44,12 +47,12 @@ def on_startup():
     db = next(get_db())
     seed_if_empty(db)
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
 
 @app.get("/")
 def read_root():
-    return FileResponse("static/index.html")
-
+    return FileResponse(os.path.join(BASE_DIR, "static", "index.html"))
 # ---------- Auth dependency ----------
 
 
