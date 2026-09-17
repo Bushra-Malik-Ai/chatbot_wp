@@ -4,8 +4,8 @@ from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
-from app.database import Base, engine, get_db
-from app import models, schemas, nlu, security
+from database import Base, engine, get_db
+import models, schemas, nlu, security
 
 Base.metadata.create_all(bind=engine)
 
@@ -44,11 +44,11 @@ def on_startup():
     db = next(get_db())
     seed_if_empty(db)
 
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/")
 def read_root():
-    return FileResponse("app/static/index.html")
+    return FileResponse("static/index.html")
 
 # ---------- Auth dependency ----------
 
