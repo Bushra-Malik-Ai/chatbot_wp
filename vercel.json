@@ -2,7 +2,8 @@
   "builds": [
     {
       "src": "admin-chatbot-fastapi/app/main.py",
-      "use": "@vercel/python"
+      "use": "@vercel/python",
+      "config": { "includeFiles": "admin-chatbot-fastapi/app/**" }
     }
   ],
   "routes": [
