@@ -12,7 +12,14 @@ import app.security as security
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Directory Admin Chatbot")
+from app.database import SessionLocal
+db = SessionLocal()
+if not db.query(models.User).filter_by(email="samantha@company.com").first():
+    db.add(models.User(name="Samantha Reyes", email="samantha@company.com", phone="+923001234567", city="Lahore"))
+    db.commit()
+db.close()
 
+models.Base.metadata.create_all(bind=engine)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
