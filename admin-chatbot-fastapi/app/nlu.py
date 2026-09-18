@@ -10,7 +10,7 @@ Each function returns (success: bool, message: str). All DB writes happen here.
 """
 import re
 from sqlalchemy.orm import Session
-from app.models import User
+from app import models
 
 ALLOWED_FIELDS = {"city", "phone", "name", "email"}
 
