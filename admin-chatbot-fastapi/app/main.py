@@ -83,7 +83,7 @@ def list_users(admin: models.User = Depends(get_current_admin), db: Session = De
 @app.get("/api/audit-log")
 def list_audit_logs(admin: models.User = Depends(get_current_admin), db: Session = Depends(get_db)):
     logs = db.query(models.AuditLog).order_by(models.AuditLog.id.desc()).limit(50).all()
-        return [schemas.AuditEntryOut.from_orm(l) for l in logs]
+    return [schemas.AuditEntryOut.from_orm(l) for l in logs]
 
 # ---------- Chat / NLU endpoint ---------- #
 
