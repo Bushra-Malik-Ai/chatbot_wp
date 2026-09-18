@@ -15,15 +15,35 @@ app = FastAPI(title="Directory Admin Chatbot")
 from app.database import SessionLocal
 db = SessionLocal()
 if not db.query(models.User).filter_by(email="samantha@company.com").first():
-    db.add(models.User(name="Samantha Reyes", email="samantha@company.com", phone="+923001234567", city="Lahore"))
-    db.commit()
-db.close()
+    import app.security as security
 
-models.Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(title="Directory Admin Chatbot")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+def seed_if_empty(db: Session):
+    if db.query(models.User).count() == 0:
+        db.add_all([
+            models.User(name="Samantha Reyes", email="samantha@company.com", phone="+923001234567", city="Lahore"),
+            models.User(name="Ahsan Malik", email="ahsan.malik@company.com", phone="+923214567890", city="Karachi"),
+            models.User(name="Bushra Aziz", email="bushra@company.com", phone="+923339876543", city="Islamabad"),
+        ])
+        db.commit()
+
+@app.on_event("startup")
+def on_startup():
+    db = SessionLocal()
+    try:
+        seed_if_empty(db)
+    finally:
+        db.close()
     allow_headers=["*"],
 )
 
