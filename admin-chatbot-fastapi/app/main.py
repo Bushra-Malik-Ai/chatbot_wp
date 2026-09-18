@@ -21,13 +21,13 @@ app.add_middleware(
 )
 
 def seed_if_empty(db: Session):
-    if db.query(models.User).count() == 0:
-        db.add_all([
-            models.User(name="Samantha Reyes", email="samantha@company.com", phone="+923001234567", city="Lahore"),
-            models.User(name="Ahsan Malik", email="ahsan.malik@company.com", phone="+923214567890", city="Karachi"),
-            models.User(name="Bushra Aziz", email="bushra@company.com", phone="+923339876543", city="Islamabad"),
-        ])
-        db.commit()
+    if not db.query(models.User).filter_by(email="samantha@company.com").first():
+        db.add(models.User(name="Samantha Reyes", email="samantha@company.com", phone="+923001234567", city="Lahore"))
+    if not db.query(models.User).filter_by(email="ahsan.malik@company.com").first():
+        db.add(models.User(name="Ahsan Malik", email="ahsan.malik@company.com", phone="+923214567890", city="Karachi"))
+    if not db.query(models.User).filter_by(email="bushra@company.com").first():
+        db.add(models.User(name="Bushra Aziz", email="bushra@company.com", phone="+923339876543", city="Islamabad"))
+    db.commit()
 
 @app.on_event("startup")
 def on_startup():
