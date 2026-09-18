@@ -86,72 +86,8 @@ def list_audit_logs(admin: models.User = Depends(get_current_admin), db: Session
 @app.post("/api/chat")
 def chat(payload: dict, admin: models.User = Depends(get_current_admin), db: Session = Depends(get_db)):
     msg = payload.get("message", "")
-    intent, entities = nlu.parse_command(msg)
+    success, reply = nlu.handle_command(db, msg)
     
-    if intent == "UNKNOWN":
-        log = models.AuditLog(actor_email=admin.email, message=msg, success=False, result="Could not parse command intent")
-        db.add(log)
-        db.commit()
-        return {"reply": "I couldn't understand that command. Try asking to add, update, or remove a user.", "success": False}
-
-    success = False
-    reply = ""
-
-    if intent == "ADD_USER":
-        email = entities.get("email")
-        if not email:
-            reply = "Please specify an email address for the user."
-        elif db.query(models.User).filter_by(email=email).first():
-            reply = f"User with email '{email}' already exists."
-        else:
-            name = entities.get("name") or email.split("@")[0].replace(".", " ").title()
-            new_user = models.User(name=name, email=email, phone=entities.get("phone"), city=entities.get("city"))
-            db.add(new_user)
-            db.commit()
-            success = True
-            reply = f"Added user {name} ({email})."
-
-    elif intent == "REMOVE_USER":
-        email = entities.get("email")
-        if not email:
-            reply = "Please specify the email address of the user to remove."
-        else:
-            target = db.query(models.User).filter_by(email=email).first()
-            if not target:
-                reply = f"User with email '{email}' not found."
-            else:
-                db.delete(target)
-                db.commit()
-                success = True
-                reply = f"Removed user {email}."
-
-    elif intent == "UPDATE_USER":
-        email = entities.get("email")
-        if not email:
-            reply = "Please specify the email of the user to update."
-        else:
-            target = db.query(models.User).filter_by(email=email).first()
-            if not target:
-                reply = f"User with email '{email}' not found."
-            else:
-                updated_fields = []
-                if "city" in entities:
-                    target.city = entities["city"]
-                    updated_fields.append(f"city to {entities['city']}")
-                if "phone" in entities:
-                    target.phone = entities["phone"]
-                    updated_fields.append(f"phone to {entities['phone']}")
-                if "name" in entities:
-                    target.name = entities["name"]
-                    updated_fields.append(f"name to {entities['name']}")
-                
-                if updated_fields:
-                    db.commit()
-                    success = True
-                    reply = f"Updated {target.email}: {', '.join(updated_fields)}."
-                else:
-                    reply = "No valid fields provided to update."
-
     log = models.AuditLog(actor_email=admin.email, message=msg, success=success, result=reply)
     db.add(log)
     db.commit()
