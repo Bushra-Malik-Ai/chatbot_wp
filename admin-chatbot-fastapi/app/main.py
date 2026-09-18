@@ -58,9 +58,14 @@ def login(payload: dict, db: Session = Depends(get_db)):
     email = payload.get("email", "").strip()
     if not email:
         return {"success": False, "message": "Email is required"}
+    
+    # Force auto-seed if database is empty or missing Samantha
+    seed_if_empty(db)
+
     user = db.query(models.User).filter_by(email=email).first()
     if not user:
-        return {"success": False, "message": f"No account found for '{email}'. Check spelling or use a seeded email."}
+        return {"success": False, "message": f"No account found for '{email}'."}
+    
     token = security.create_token(email)
     return {
         "success": True,
