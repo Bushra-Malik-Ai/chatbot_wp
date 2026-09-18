@@ -55,17 +55,17 @@ def get_current_admin(authorization: str = Header(None), db: Session = Depends(g
 
 @app.post("/api/login")
 def login(payload: dict, db: Session = Depends(get_db)):
+    # Always ensure default users exist on login attempt
+    seed_if_empty(db)
+
     email = payload.get("email", "").strip()
     if not email:
         return {"success": False, "message": "Email is required"}
-    
-    # Force auto-seed if database is empty or missing Samantha
-    seed_if_empty(db)
 
     user = db.query(models.User).filter_by(email=email).first()
     if not user:
         return {"success": False, "message": f"No account found for '{email}'."}
-    
+
     token = security.create_token(email)
     return {
         "success": True,
@@ -92,7 +92,7 @@ def list_audit_logs(admin: models.User = Depends(get_current_admin), db: Session
 def chat(payload: dict, admin: models.User = Depends(get_current_admin), db: Session = Depends(get_db)):
     msg = payload.get("message", "")
     success, reply = nlu.handle_command(db, msg)
-    
+
     log = models.AuditLog(actor_email=admin.email, message=msg, success=success, result=reply)
     db.add(log)
     db.commit()
