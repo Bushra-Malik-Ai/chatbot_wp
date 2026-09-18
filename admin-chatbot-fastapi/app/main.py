@@ -7,8 +7,11 @@ import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 
-from database import Base, engine, get_db
-import models, schemas, nlu, security
+from app.database import Base, engine, get_db
+import app.models as models
+import app.schemas as schemas
+import app.nlu as nlu
+import app.security as security
 
 Base.metadata.create_all(bind=engine)
 
