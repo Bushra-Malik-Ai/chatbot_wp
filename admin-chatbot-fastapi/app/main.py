@@ -43,7 +43,7 @@ def get_current_admin(authorization: str = Header(None), db: Session = Depends(g
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Missing or invalid token header")
     token = authorization.split(" ")[1]
-    payload = security.verify_token(token)
+    payload = security.decode_access_token(token)
     if not payload:
         raise HTTPException(status_code=401, detail="Invalid or expired token")
     admin = db.query(models.User).filter_by(email=payload.get("sub")).first()
