@@ -13,17 +13,7 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Directory Admin Chatbot")
 from app.database import SessionLocal
-db = SessionLocal()
-if not db.query(models.User).filter_by(email="samantha@company.com").first():
-    import app.security as security
 
-Base.metadata.create_all(bind=engine)
-
-app = FastAPI(title="Directory Admin Chatbot")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
