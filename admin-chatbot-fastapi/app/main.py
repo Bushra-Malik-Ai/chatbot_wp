@@ -65,7 +65,7 @@ def login(payload: dict, db: Session = Depends(get_db)):
     if not user:
         return {"success": False, "message": f"No account found for '{email}'."}
 
-    token = security.create_token(email)
+    token = security.create_access_token(email)
     return {
         "success": True,
         "access_token": token,
