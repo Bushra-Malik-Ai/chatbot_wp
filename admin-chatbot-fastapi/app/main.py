@@ -55,7 +55,6 @@ def get_current_admin(authorization: str = Header(None), db: Session = Depends(g
 
 @app.post("/api/login")
 def login(payload: dict, db: Session = Depends(get_db)):
-    # Always ensure default users exist on login attempt
     seed_if_empty(db)
 
     email = payload.get("email", "").strip()
